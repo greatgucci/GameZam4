@@ -91,6 +91,7 @@ public class PlayerMoving : MonoBehaviour {
     public int jumpCounter;
 
     public float moveSpeed;
+    private float moveSpeedTempt;
     public float jumpHeight;
     public float downSpeed;
     SkeletonAnimation myAnim;
@@ -115,6 +116,7 @@ public class PlayerMoving : MonoBehaviour {
 
         if (isEnable)
         {
+            rig.velocity = new Vector3(moveSpeedTempt, rig.velocity.y, 0);
             if(!isAlchoal)
             {
                 if (Input.GetKeyDown(KeyCode.Space))
@@ -124,31 +126,21 @@ public class PlayerMoving : MonoBehaviour {
 
                 if (Input.GetKey(KeyCode.LeftArrow))
                 {
-                    transform.localScale = new Vector2(-playerScale, playerScale);
-                    rig.velocity = new Vector3(-moveSpeed, rig.velocity.y, 0);
-                    if (isGrounded)
-                        changeAnim(true, 1f, "RUN");
+                    moveLeft();
                 }
                 if (Input.GetKey(KeyCode.RightArrow))
                 {
-                    transform.localScale = new Vector2(playerScale, playerScale);
-                    rig.velocity = new Vector3(moveSpeed, rig.velocity.y, 0);
-                    if (isGrounded)
-                        changeAnim(true, 1f, "RUN");
+                    moveRight();
                 }
                 if (Input.GetKey(KeyCode.DownArrow))
                 {
-                    rig.velocity = new Vector2(rig.velocity.x, -downSpeed);
-                    changeAnim(false, 1f, "WARF");
+                    warfDown();
                 }
 
                 if (Input.GetKeyDown(KeyCode.Space) && jumpCounter <= jumpConditioner)
                 {
                     //if (rig.velocity.y < 0)
-                    rig.velocity = new Vector2(rig.velocity.x, 0);
-                    rig.velocity += new Vector2(0, jumpHeight);
-                    changeAnim(false, 1f, "JUMP");
-
+                    jumpUp();
                 }
             }
             else
@@ -161,35 +153,26 @@ public class PlayerMoving : MonoBehaviour {
                 changeAnim(true, 1f, "IDLE");
                 if (Input.GetKey(KeyCode.RightArrow))
                 {
-                    transform.localScale = new Vector2(-playerScale, playerScale);
-                    rig.velocity = new Vector3(-moveSpeed, rig.velocity.y, 0);
-                    if (isGrounded && rig.velocity.x < 0.1)
-                        changeAnim(true, 1f, "RUN");
+                    moveRight();
                 }
                 if (Input.GetKey(KeyCode.LeftArrow))
                 {
-                    transform.localScale = new Vector2(playerScale, playerScale);
-                    rig.velocity = new Vector3(moveSpeed, rig.velocity.y, 0);
-                    if (isGrounded&&rig.velocity.x<0.1)
-                        changeAnim(true, 1f, "RUN");
+                    moveLeft();
                 }
                 if (Input.GetKey(KeyCode.DownArrow))
                 {
-                    rig.velocity = new Vector2(rig.velocity.x, -downSpeed);
-                    if(rig.velocity.y>0)
-                    changeAnim(true, 1f, "WARF");
+                    warfDown();
                 }
 
                 if (Input.GetKeyDown(KeyCode.Space) && jumpCounter <= jumpConditioner)
                 {
                     //if (rig.velocity.y < 0)
-                    rig.velocity = new Vector2(rig.velocity.x, 0);
-                    rig.velocity += new Vector2(0, jumpHeight);
-                    changeAnim(false, 1f, "JUMP");
+                    jumpUp();
                     AudioManager.instance.jump.Play();
                 }
+                               
             }
-           
+            
         }
     }
 
@@ -228,4 +211,39 @@ public class PlayerMoving : MonoBehaviour {
         myAnim.timeScale = _timescale;
         myAnim.AnimationName = aniName;
     }
+    public void moveRight()
+    {
+        transform.localScale = new Vector2(playerScale, playerScale);
+        moveSpeedTempt = moveSpeed;
+        Debug.Log("a right");
+        if (isGrounded && moveSpeedTempt < 0.1)
+            changeAnim(true, 1f, "RUN");
+
+    }
+    public void moveLeft()
+    {
+        transform.localScale = new Vector2(-playerScale, playerScale);
+        Debug.Log("a Left");
+        moveSpeedTempt = -moveSpeed;
+        if (isGrounded && moveSpeedTempt < 0.1)
+            changeAnim(true, 1f, "RUN");
+    }
+    public void moveStop()
+    {
+        moveSpeedTempt = 0;
+    }
+    public void warfDown()
+    {
+        rig.velocity = new Vector2(rig.velocity.x, -downSpeed);
+        if (rig.velocity.y > 0)
+            changeAnim(true, 1f, "WARF");
+    }
+    public void jumpUp()
+    {
+        rig.velocity = new Vector2(rig.velocity.x, 0);
+        rig.velocity += new Vector2(0, jumpHeight);
+        changeAnim(false, 1f, "JUMP");
+
+    }
+
 }
